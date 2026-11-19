@@ -1,36 +1,31 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.urls import reverse
+from django.template.loader import render_to_string
 
 
 
 monthly_challenge_name = {
-    "january": "this is jan C",
-    "february": "this is feb C",
-    "march": "this is mar C",
-    "april": "this is apr C",
-    "may": "this is may C",
-    "june": "this is jun C",
-    "july": "this is jul C",
-    "august": "this is aug C",
-    "september": "this is sep C",
-    "october": "this is oct C",
-    "november": "this is nov C",
-    "december": "this is dec C"
+    "january": "This is January Challenge",
+    "february": "This is February Challenge",
+    "march": "This is March Challenge",
+    "april": "This is April Challenge",
+    "may": "This is May Challenge",
+    "june": "This is June Challenge",
+    "july": "This is July Challenge",
+    "august": "This is August Challenge",
+    "september": "This is September Challenge",
+    "october": "This is October Challenge",
+    "november": "This is November Challenge",
+    "december": "This is December Challenge"
 }
 # Create your views here.
 
 def index(request):
-    list_items = ""
     months = list(monthly_challenge_name.keys())
-
-    for month in months:
-        capitalized_month = month.capitalize()
-        month_path = reverse("month-challenge", args=[month])
-        list_items += f"<li><a href=\"{month_path}\">{capitalized_month}</a></li>"
-
-    response_data = f"<ul>{list_items}</ul>"
-    return HttpResponse(response_data)
+    return render(request, "challenges/index.html", {
+        "months": months
+    })
 
 def monthly_challenge_by_number(request, month):
     months = list(monthly_challenge_name.keys())
@@ -45,7 +40,9 @@ def monthly_challenge_by_number(request, month):
 def monthly_challenge(request, month):
     try:
         challenges_name = monthly_challenge_name[month]
-        return HttpResponse(challenges_name)
+        return render(request, "challenges/challenges.html", {
+            "text": challenges_name,
+            "month_name": month
+        })
     except:
-        return HttpResponse("Invalid month")
-    
+        return HttpResponseNotFound("Invalid month")
