@@ -1,24 +1,30 @@
 # Monthly Challenges
 
-A Django project built while learning URL dispatching, dynamic path converters, named URLs, HTTP redirects, and Django templates (variables, filters, and template tags).
+A Django project built while learning URL dispatching, dynamic path converters, named URLs, HTTP redirects, template inheritance, and template tags.
 
 ## What it does
 
 The application provides monthly challenges through dynamic URLs and Django templates:
 
-1. **Challenges Index**: Visiting `/challenges/` renders `index.html`, displaying an unordered list of all 12 months. Each link is generated dynamically using the `{% for %}` loop and `{% url %}` template tag.
+1. **Challenges Index**: Visiting `/challenges/` renders `index.html`, displaying an unordered list of all 12 months. Each link is generated dynamically using a `{% for %}` loop and the `{% url %}` template tag.
 2. **Individual Challenge Pages**: Visiting `/challenges/january`, `/challenges/february`, etc. renders `challenges.html` with dynamic context:
    - `{{ text }}` renders the monthly challenge text.
-   - `{{ month_name|title }}` dynamically sets the page title in the browser tab.
+   - `{{ month_name|title }}` sets the page title in the browser tab.
+   - Conditional rendering (`{% if text is not None %}`) displays a fallback notice if a month has no active challenge (e.g., December).
 3. **Numeric Redirects with Named URLs**: Visiting `/challenges/1`, `/challenges/2`, etc. automatically redirects to the corresponding month URL (`/challenges/january`) using `HttpResponseRedirect` and `reverse()`.
 4. **Error Handling**: Requests for months outside 1-12 or invalid month names return an HTTP 404 via `HttpResponseNotFound`.
 
-## Template Architecture
+## Template Architecture & Inheritance
 
-Templates are namespaced inside the app under `challenges/templates/challenges/`:
+Templates use a shared layout structure through template inheritance:
 
-- `index.html`: Loops through months passed from the view, generating clickable links with `{% url 'month-challenge' month %}`.
-- `challenges.html`: Displays individual challenge text and dynamic page title using Django template variables.
+- **Root Base Template (`templates/base.html`)**:
+  - Serves as the global HTML skeleton defining the `<head>`, `<title>`, and block tags: `{% block page_title %}` and `{% block content %}`.
+  - Located at the project root and registered in `monthly_challenges/settings.py` via `TEMPLATES['DIRS'] = [BASE_DIR / "templates"]`.
+
+- **App Templates (`challenges/templates/challenges/`)**:
+  - `index.html`: Extends `base.html`, injects the "All Challenges" title into `page_title`, and renders the list of months inside `content`.
+  - `challenges.html`: Extends `base.html`, injects the dynamic month title into `page_title`, and renders the challenge text or fallback message inside `content`.
 
 ## URL Configuration
 
@@ -37,7 +43,8 @@ python manage.py runserver
 ```
 
 Open your browser and test:
-- `http://127.0.0.1:8000/challenges/` (index page with month links)
+- `http://127.0.0.1:8000/challenges/` (index page extending base layout)
 - `http://127.0.0.1:8000/challenges/1` (redirects to `/challenges/january`)
-- `http://127.0.0.1:8000/challenges/january` (renders January challenge template)
+- `http://127.0.0.1:8000/challenges/january` (renders January challenge)
+- `http://127.0.0.1:8000/challenges/december` (renders fallback "no challenge" message)
 - `http://127.0.0.1:8000/challenges/13` (returns 404)

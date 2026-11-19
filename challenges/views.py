@@ -17,7 +17,7 @@ monthly_challenge_name = {
     "september": "This is September Challenge",
     "october": "This is October Challenge",
     "november": "This is November Challenge",
-    "december": "This is December Challenge"
+    "december": None
 }
 # Create your views here.
 
