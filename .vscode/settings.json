@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "*.py": "python"
+  },
+  "editor.semanticHighlighting.enabled": true
+}
